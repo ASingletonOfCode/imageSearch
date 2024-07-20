@@ -128,3 +128,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 MEDIA_ROOT = BASE_DIR / "images"
 MEDIA_URL = "/images/"
+
+IMAGGA_API_KEY = "imagga_api_key"
+IMAGGA_API_SECRET = "1234"
