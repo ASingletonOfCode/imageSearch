@@ -24,6 +24,7 @@ class Image(models.Model):
         choices=[(tag.name, tag.value) for tag in SourceType],
         max_length=15,
     )
+    source_url = models.URLField(null=True, blank=True)
     source = models.ImageField(
         upload_to="%Y/%m/%d",
         null=True,

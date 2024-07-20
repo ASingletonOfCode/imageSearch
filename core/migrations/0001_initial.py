@@ -99,6 +99,7 @@ class Migration(migrations.Migration):
                         to="core.imageupload",
                     ),
                 ),
+                ("source_url", models.URLField(blank=True, null=True)),
             ],
         ),
     ]

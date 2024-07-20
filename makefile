@@ -12,3 +12,7 @@ test:
 # Usage: make black
 black:
 	black .
+
+# Update the requirements.txt file from pip
+update_requirements:
+	pip freeze > requirements.txt	
