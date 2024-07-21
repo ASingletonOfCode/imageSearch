@@ -21,8 +21,7 @@ class ImaggaClient:
             print(response.json())
             return response.json()
         else:
-            # TODO handle error
-            pass
+            self._error_response_handler(response)
 
     def get_tag_image_for_upload(self, upload_id):
         response = requests.get(
@@ -34,8 +33,7 @@ class ImaggaClient:
             print(response.json())
             return response.json()
         else:
-            # TODO handle error
-            pass
+            self._error_response_handler(response)
 
     def upload_image(self, image_path):
         response = requests.post(
@@ -45,8 +43,17 @@ class ImaggaClient:
         )
 
         if response.status_code == 200:
-            print(response.json())
             return response.json()
         else:
-            # TODO handle error
-            pass
+            self._error_response_handler(response)
+
+    def _error_response_handler(self, response):
+        if response.status_code == 401:
+            msg = "Unauthorized. Please check your API key and secret for Imagga."
+        elif response.status_code == 404:
+            msg = "Resource not found. Please check the URL."
+        elif response.status_code == 400:
+            msg = "Bad Request. Please check the request parameters."
+        else:
+            msg = f"An unexpected error occurred. Please try again later. Message: {response.message}"
+        raise ValueError(msg)

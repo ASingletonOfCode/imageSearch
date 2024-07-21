@@ -11,14 +11,14 @@ def process_image_upload(image: Image):
     Process image upload by first determining the source type of the image and then using the appropriate client method to tag the image. Then stores
     the relevant models in the database.
     """
-    if image.source_type == SourceType.UPLOAD:
+    if image.source_type == SourceType.UPLOAD.name:
         image.image_upload = upload_image(image)
         image.save()
         # TODO Check image categorization for blacklisted tags/objects before proceeding
         image_tag_response = imagga_client.get_tag_image_for_upload(
             image.image_upload.upload_id
         )
-    elif image.source_type == SourceType.URL:
+    elif image.source_type == SourceType.URL.name:
         image_tag_response = imagga_client.get_tag_image(image.source_url)
         # TODO Check image categorization for blacklisted tags/objects before proceeding
     else:
@@ -33,7 +33,10 @@ def upload_image(image: Image):
     """
     Upload the image to Imagga and store the ImageUpload model in the database.
     """
-    upload_response = imagga_client.upload_image(image.source)
+    try:
+        upload_response = imagga_client.upload_image(image.source)
+    except Exception as e:
+        raise ValueError(f"Exception while uploading image: {e}")
     upload_id = upload_response["result"]["upload_id"]
     image_upload = ImageUpload.objects.create(
         image=image, upload_id=upload_id, status=upload_response["status"]["type"]
