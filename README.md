@@ -75,6 +75,8 @@
 
 3. The application will not support additional authentication to reach image URL's not publicly available; for example, an image only accessible privately in someone's Google Photo's suite which would require the application to authenticate with Google to access the photo.
 
+4. Another limitation of the Imagga API is that there is a 5 second limit for downloading an image via URL; that is, if a user requests an image to be searched using a URL rather than uploading the image directly Imagga will return a timeout error, which the application will be forced to bubble up to the user.
+
 ## Application Details
 
 ### Framework Dependencies

@@ -167,3 +167,4 @@ cython_debug/
 # Images added locally for testing purposes
 example_images/
 example-images/*
+images/*
