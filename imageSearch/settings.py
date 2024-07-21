@@ -139,9 +139,9 @@ REST_FRAMEWORK = {
     #     'rest_framework.renderers.BrowsableAPIRenderer',
     #     'rest_framework.renderers.MultiPartRenderer',
     # ),
-    'DEFAULT_PARSER_CLASSES': (
-        'rest_framework.parsers.JSONParser',
-        'rest_framework.parsers.FormParser',
-        'rest_framework.parsers.MultiPartParser'
+    "DEFAULT_PARSER_CLASSES": (
+        "rest_framework.parsers.JSONParser",
+        "rest_framework.parsers.FormParser",
+        "rest_framework.parsers.MultiPartParser",
     )
 }

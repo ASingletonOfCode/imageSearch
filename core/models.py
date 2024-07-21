@@ -39,8 +39,7 @@ class Image(models.Model):
     blacklisted = models.BooleanField(default=False)
 
     def __str__(self):
-        return (
-f"""Image: {self.label}
+        return f"""Image: {self.label}
 Source Type: {self.source_type}
 Source URL: {self.source_url}
 Source: {self.source}
@@ -48,7 +47,7 @@ Date Created: {self.date_created}
 Detected Objects: {self.detected_objects}
 Uploaded By: {self.uploaded_by}
 Blacklisted: {self.blacklisted}
-""")
+"""
 
 
 class ImageUpload(models.Model):

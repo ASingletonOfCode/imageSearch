@@ -48,8 +48,4 @@ def _process_image_tags(image_response: dict):
     """
     Process the image tags from the Imagga API response and return a list of tags.
     """
-    tags = image_response["result"]["tags"] or []
-
-    temp = [tag["tag"]["en"] for tag in tags]
-    print(temp)
-    return temp
+    return [tag["tag"]["en"] for tag in image_response["result"]["tags"] or []]

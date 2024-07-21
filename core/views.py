@@ -1,6 +1,8 @@
-from django.shortcuts import render
+from functools import reduce
+from django.db.models import Q
 
 from rest_framework import permissions, viewsets
+from rest_framework.response import Response
 
 from core.models import Image
 from core.serializers import ImageSerializer
@@ -22,7 +24,13 @@ class ImageViewSet(viewsets.ModelViewSet):
         objects = request.query_params.get("objects", None)
         if objects is not None:
             queryset = Image.objects.filter(
-                reduce(lambda x, y: x | y, [Q(detected_objects__icontains=object) for object in objects.split(",")])
+                reduce(
+                    lambda x, y: x | y,
+                    [
+                        Q(detected_objects__icontains=object)
+                        for object in objects.split(",")
+                    ],
+                )
             )
             serializer = ImageSerializer(queryset, many=True)
             return Response(
