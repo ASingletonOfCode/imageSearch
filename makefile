@@ -21,3 +21,20 @@ update_requirements:
 # Usage: make shell
 shell:
 	python manage.py shell
+
+# Make target to build the docker image
+# Usage: make build
+build:
+	docker build -t image-search .
+
+# Make target to run the docker container in detached
+# Usage: make run
+run:
+	docker run -d --name imageSearch -p 8000:8000 image-search
+
+# Make target to build then run a new docker image
+# Usage: make docker_run
+docker_run: 
+	if docker container ls | grep imageSearch; then docker stop imageSearch && docker rm imageSearch; fi
+	make build
+	make run
