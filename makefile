@@ -16,3 +16,8 @@ black:
 # Update the requirements.txt file from pip
 update_requirements:
 	pip freeze > requirements.txt	
+
+# Make target to start the django shell
+# Usage: make shell
+shell:
+	python manage.py shell
