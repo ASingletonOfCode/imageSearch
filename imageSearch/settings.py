@@ -10,7 +10,13 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+import os
 from pathlib import Path
+
+from dotenv import dotenv_values
+
+
+env_config = dotenv_values("local.env") # With no intention of deploying this in a public way (ie "Production") always assume local environment
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -132,8 +138,8 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 MEDIA_ROOT = BASE_DIR / "images"
 MEDIA_URL = "/images/"
 
-IMAGGA_API_KEY = "imagga_api_key"
-IMAGGA_API_SECRET = "1234"
+IMAGGA_API_KEY = env_config.get("IMAGGA_API_KEY")
+IMAGGA_API_SECRET = env_config.get("IMAGGA_AUTH_KEY")
 
 REST_FRAMEWORK = {
         "DEFAULT_PERMISSION_CLASSES": [
