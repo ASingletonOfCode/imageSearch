@@ -117,7 +117,9 @@ _TODO_
 
     ```
 
-2.  Let's start the app and make sure we can access Django-Admin. Provided in the root directory is a makefile with a few targets to save us some typing.
+    Then we need to make sure our Imagga API creds are setup. Open the file [local.env](./local.env) and replace the values for `IMAGGA_API_KEY` and `IMAGGA_AUTH_KEY` with your personal values.
+
+2.  Let's start the app and make sure we can access Django-Admin. Provided in the root directory is a [makefile](./makefile) with a few targets to save us some typing.
 
     ```
 
@@ -133,7 +135,7 @@ _TODO_
 
 ### Additional Help
 
-As mentioned in the [Local Setup](local setup) section, a `makefile` has been provided for some common commands.
+As mentioned in the [Local Setup](#local-setup) section, a `makefile` has been provided for some common commands.
 
 To run tests:
 
@@ -142,7 +144,7 @@ To run tests:
 make test
 ```
 
-To run the formatter, Black:
+To run the python formatter, Black:
 
 ```
 # the following make target wraps `black .`

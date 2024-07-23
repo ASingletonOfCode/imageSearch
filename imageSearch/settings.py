@@ -10,7 +10,13 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+import os
 from pathlib import Path
+
+from dotenv import dotenv_values
+
+
+env_config = dotenv_values("local.env") # With no intention of deploying this in a public way (ie "Production") always assume local environment
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -39,10 +45,12 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "corsheaders",
     "safedelete",
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -130,10 +138,13 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 MEDIA_ROOT = BASE_DIR / "images"
 MEDIA_URL = "/images/"
 
-IMAGGA_API_KEY = "imagga_api_key"
-IMAGGA_API_SECRET = "1234"
+IMAGGA_API_KEY = env_config.get("IMAGGA_API_KEY")
+IMAGGA_API_SECRET = env_config.get("IMAGGA_AUTH_KEY")
 
 REST_FRAMEWORK = {
+        "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly",
+    ],
     # 'DEFAULT_RENDERER_CLASSES': (
     #     'rest_framework.renderers.JSONRenderer',
     #     'rest_framework.renderers.BrowsableAPIRenderer',
@@ -145,3 +156,25 @@ REST_FRAMEWORK = {
         "rest_framework.parsers.MultiPartParser",
     )
 }
+
+CORS_ALLOW_HEADERS = [
+    "content-type",
+    "access-control-allow-header",
+    "x-requested-with",
+    "accept",
+    "origin",
+    "user-agent",
+    "dnt",
+    "cache-control",
+    "x-mx-reqtoken",
+    "x-csrftoken",
+    "x-frame-options",
+]
+
+# if os.environ.get("DJANGO_ENV") == "local":
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_HEADERS.append("authorization")
+# else:
+#     CORS_ALLOWED_ORIGINS = [
+#         "http://localhost",
+#     ]
