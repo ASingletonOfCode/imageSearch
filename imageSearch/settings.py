@@ -39,10 +39,12 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "corsheaders",
     "safedelete",
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -134,6 +136,9 @@ IMAGGA_API_KEY = "imagga_api_key"
 IMAGGA_API_SECRET = "1234"
 
 REST_FRAMEWORK = {
+        "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly",
+    ],
     # 'DEFAULT_RENDERER_CLASSES': (
     #     'rest_framework.renderers.JSONRenderer',
     #     'rest_framework.renderers.BrowsableAPIRenderer',
@@ -145,3 +150,25 @@ REST_FRAMEWORK = {
         "rest_framework.parsers.MultiPartParser",
     )
 }
+
+CORS_ALLOW_HEADERS = [
+    "content-type",
+    "access-control-allow-header",
+    "x-requested-with",
+    "accept",
+    "origin",
+    "user-agent",
+    "dnt",
+    "cache-control",
+    "x-mx-reqtoken",
+    "x-csrftoken",
+    "x-frame-options",
+]
+
+# if os.environ.get("DJANGO_ENV") == "local":
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_HEADERS.append("authorization")
+# else:
+#     CORS_ALLOWED_ORIGINS = [
+#         "http://localhost",
+#     ]
