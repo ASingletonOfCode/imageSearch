@@ -60,3 +60,59 @@ class ImageUpload(models.Model):
     error_message = models.TextField(null=True, blank=True)
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
+
+
+class AppConfig(models.Model):
+    """
+    Class to store the AppConfig for the application
+    """
+
+    key = models.CharField(max_length=100, unique=True)
+    value = models.TextField(null=True, blank=True)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(
+        "auth.User",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="created_app_config",  # Unique related_name for created_by
+    )
+    modified_by = models.ForeignKey(
+        "auth.User",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="modified_app_config",  # Unique related_name for modified_by
+    )
+
+    def __str__(self):
+        return f"Key: {self.key} -- Value: {self.value}  -- Created By: {self.created_by.username} -- Modified By: {self.modified_by.username}"
+
+
+class FeatureFlag(models.Model):
+    """
+    Class to store the FeatureFlag for the application
+    """
+
+    name = models.CharField(max_length=100, unique=True)
+    active = models.BooleanField()
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(
+        "auth.User",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="created_feature_flags",  # Unique related_name for created_by
+    )
+    modified_by = models.ForeignKey(
+        "auth.User",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="modified_feature_flags",  # Unique related_name for modified_by
+    )
+
+    def __str__(self):
+        return f"Name: {self.name} -- Is Active: {self.active} -- Created By: {self.created_by.username} -- Last Modified By: {self.modified_by.username}"

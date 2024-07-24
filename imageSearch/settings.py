@@ -179,3 +179,5 @@ CORS_ALLOW_HEADERS.append("authorization")
 #     CORS_ALLOWED_ORIGINS = [
 #         "http://localhost",
 #     ]
+
+IMAGE_SAFETY_CONFIDENCE_DEFAULT_THRESHOLD = 51.0
