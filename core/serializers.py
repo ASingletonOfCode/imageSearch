@@ -20,14 +20,17 @@ class ImageSerializer(serializers.HyperlinkedModelSerializer):
 
     # TODO: Allow uppercase and lowercase source_type
     def create(self, validated_data):
-        image = Image.objects.create(
-            **{"uploaded_by": self.context["request"].user}, **validated_data
-        )
+        try:
+            image = Image.objects.create(
+                uploaded_by=self.context["request"].user, **validated_data
+            )
 
-        if bool(self.data.get("detect_objects")) == True:
-            process_image_upload(image)
-        else:
-            # TODO: Log that image was not processed
-            pass
+            if bool(self.data.get("detect_objects")) == True:
+                process_image_upload(image)
+            else:
+                print("Skipping image processing based on user input...")
+        except Exception as e:
+            print(e)
+            raise serializers.ValidationError("Error creating image.")
 
         return image
