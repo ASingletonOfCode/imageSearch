@@ -10,13 +10,14 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
-import os
 from pathlib import Path
 
 from dotenv import dotenv_values
 
 
-env_config = dotenv_values("local.env") # With no intention of deploying this in a public way (ie "Production") always assume local environment
+env_config = dotenv_values(
+    "local.env"
+)  # With no intention of deploying this in a public way (ie "Production") always assume local environment
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -142,7 +143,7 @@ IMAGGA_API_KEY = env_config.get("IMAGGA_API_KEY")
 IMAGGA_API_SECRET = env_config.get("IMAGGA_AUTH_KEY")
 
 REST_FRAMEWORK = {
-        "DEFAULT_PERMISSION_CLASSES": [
+    "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly",
     ],
     # 'DEFAULT_RENDERER_CLASSES': (
@@ -154,7 +155,7 @@ REST_FRAMEWORK = {
         "rest_framework.parsers.JSONParser",
         "rest_framework.parsers.FormParser",
         "rest_framework.parsers.MultiPartParser",
-    )
+    ),
 }
 
 CORS_ALLOW_HEADERS = [

@@ -16,7 +16,7 @@ class UploadStatusType(Enum):
 
 
 class Image(models.Model):
-    label = models.CharField(max_length=100)
+    label = models.CharField(max_length=100, null=True, blank=True)
     image_upload = models.ForeignKey(
         "ImageUpload", on_delete=models.CASCADE, null=True, blank=True
     )
@@ -39,14 +39,10 @@ class Image(models.Model):
     blacklisted = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"""Image: {self.label}
-Source Type: {self.source_type}
-Source URL: {self.source_url}
-Source: {self.source}
-Date Created: {self.date_created}
-Detected Objects: {self.detected_objects}
-Uploaded By: {self.uploaded_by}
-Blacklisted: {self.blacklisted}
+        return f"""Id: {self.id}
+Image: {self.label}
+{self.source and f"Source: {self.source}"}
+{self.source_url and f"Source Url: {self.source_url}"}
 """
 
 
