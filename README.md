@@ -4,6 +4,10 @@
 
 [Requirements Doc](./documentation-artifacts/ES-BackendSoftwareEngineerCodingExercise-250722-1431.pdf)
 
+## Frontend Application
+
+A corresponding frontend UI can be found here: https://github.com/ASingletonOfCode/imageSearchFE
+
 ### API Spec
 
 #### Common Specifications
