@@ -45,6 +45,25 @@ Image: {self.label}
 {self.source_url and f"Source Url: {self.source_url}"}
 """
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "label": self.label,
+            "image_upload_id": self.image_upload.id if self.image_upload else None,
+            "source_type": self.get_source_type_display(),  # Gets the human-readable name for the Enum choice
+            "source_url": self.source_url,
+            "source": (
+                self.source.url if self.source else None
+            ),
+            "date_created": self.date_created.isoformat(),  # Convert datetime to ISO format string
+            "detected_objects": self.detected_objects,
+            "uploaded_by_id": self.uploaded_by.id if self.uploaded_by else None,
+            "uploaded_by_username": (
+                self.uploaded_by.username if self.uploaded_by else None
+            ), 
+            "blacklisted": self.blacklisted,
+        }
+
 
 class ImageUpload(models.Model):
     """

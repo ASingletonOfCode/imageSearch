@@ -1,4 +1,5 @@
 from logging import Logger
+from django.forms import ValidationError
 from django.test import TestCase
 import mock
 import pytest
@@ -83,7 +84,8 @@ class TestProcessImageUpload(TestCase):
         image = Image(id=1, source_type=SourceType.UPLOAD.name)
 
         # Act
-        process_image_upload(image)
+        with self.assertRaises(ValidationError) as ve:
+            process_image_upload(image)
 
         # assert
         self.assertEqual(image.detected_objects, ["dog", "cat"])
@@ -91,6 +93,7 @@ class TestProcessImageUpload(TestCase):
         mock_warn_logger.assert_called_once_with(
             f"Image {image.id} contains NSFW content. Image blacklisted."
         )
+        self.assertEqual(ve.exception.message, "Image contains NSFW content.")
 
     @mock.patch.object(ImaggaClient, "upload_image")
     @mock.patch.object(ImaggaClient, "get_tag_image_for_upload")
@@ -122,7 +125,8 @@ class TestProcessImageUpload(TestCase):
         image = Image(id=1, source_type=SourceType.UPLOAD.name)
 
         # Act
-        process_image_upload(image)
+        with self.assertRaises(ValidationError) as ve:
+            process_image_upload(image)
 
         # assert
         self.assertEqual(image.detected_objects, ["dog", "cat"])
@@ -130,6 +134,7 @@ class TestProcessImageUpload(TestCase):
         mock_warn_logger.assert_called_once_with(
             f"Image {image.id} contains NSFW content. Image blacklisted."
         )
+        self.assertEqual(ve.exception.message, "Image contains NSFW content.")
 
     @mock.patch.object(ImaggaClient, "upload_image")
     @mock.patch.object(ImaggaClient, "get_tag_image")
@@ -197,7 +202,8 @@ class TestProcessImageUpload(TestCase):
         )
 
         # Act
-        process_image_upload(image)
+        with self.assertRaises(ValidationError) as ve:
+            process_image_upload(image)
 
         # assert
         mock_upload_image.assert_not_called()
@@ -207,6 +213,7 @@ class TestProcessImageUpload(TestCase):
         mock_warn_logger.assert_called_once_with(
             f"Image {image.id} contains NSFW content. Image blacklisted."
         )
+        self.assertEqual(ve.exception.message, "Image contains NSFW content.")
 
     @mock.patch.object(ImaggaClient, "upload_image")
     @mock.patch.object(ImaggaClient, "get_tag_image")
@@ -238,7 +245,8 @@ class TestProcessImageUpload(TestCase):
         )
 
         # Act
-        process_image_upload(image)
+        with self.assertRaises(ValidationError) as ve:
+            process_image_upload(image)
 
         # assert
         mock_upload_image.assert_not_called()
@@ -248,6 +256,7 @@ class TestProcessImageUpload(TestCase):
         mock_warn_logger.assert_called_once_with(
             f"Image {image.id} contains NSFW content. Image blacklisted."
         )
+        self.assertEqual(ve.exception.message, "Image contains NSFW content.")
 
     @mock.patch.object(Logger, "warn")
     @mock.patch.object(ImaggaClient, "check_nsfw_categories")

@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.forms import ValidationError
 from core.clients import ImaggaClient
 from core.constants import (
     BLACKLISTED_ITEMS_APP_CONFIG_KEY,
@@ -39,6 +40,7 @@ def process_image_upload(image: Image):
         ) or not validate_blacklisted_items(image):
             log.warn(f"Image {image.id} contains NSFW content. Image blacklisted.")
             # TODO ensure image artifact is not stored in our system
+            raise ValidationError("Image contains NSFW content.")
     elif image.source_type == SourceType.URL.name:
         image_tag_response = imagga_client.get_tag_image(image.source_url)
         image.detected_objects = _process_image_tags(image_tag_response)
@@ -47,6 +49,7 @@ def process_image_upload(image: Image):
         ) or not validate_blacklisted_items(image):
             log.warn(f"Image {image.id} contains NSFW content. Image blacklisted.")
             # TODO ensure image artifact is not stored in our system
+            raise ValidationError("Image contains NSFW content.")
 
     else:
         raise ValueError("Invalid source type")
