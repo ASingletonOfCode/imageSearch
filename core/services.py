@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.forms import ValidationError
+from rest_framework.exceptions import ValidationError
 from core.clients import ImaggaClient
 from core.constants import (
     BLACKLISTED_ITEMS_APP_CONFIG_KEY,

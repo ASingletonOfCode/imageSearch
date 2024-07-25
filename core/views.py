@@ -47,7 +47,7 @@ class ImageViewSet(viewsets.ModelViewSet):
             )
         except ValidationError as e:
             log.warn(f"Exception while processing image: {e.detail}")
-            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            raise
 
     def list(self, request, *args, **kwargs):
         """
@@ -74,9 +74,6 @@ class ImageViewSet(viewsets.ModelViewSet):
             return super().list(request, *args, **kwargs)
 
     def handle_exception(self, exc):
-        print("I'm Here!!!!")
-        # This method can be overridden to customize error handling
         if isinstance(exc, ValidationError):
-            # Return a custom response or modify the exception as needed
             return Response({"detail": exc.detail}, status=exc.status_code)
         return super().handle_exception(exc)
