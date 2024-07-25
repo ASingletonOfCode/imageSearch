@@ -26,10 +26,11 @@ class ImageViewSet(viewsets.ModelViewSet):
 
     # TODO: Allow uppercase and lowercase source_type
     def create(self, request, *args, **kwargs):
-        detect_objects = "detect_objects" in request.data and request.data.pop(
-            "detect_objects"
-    )
-        serializer = self.get_serializer(data=request.data)
+        data = request.data.copy()
+        detect_objects = data.get("detect_objects", "false").lower() == "true"
+        del data["detect_objects"]
+
+        serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
 
         try:
@@ -42,9 +43,7 @@ class ImageViewSet(viewsets.ModelViewSet):
                 log.info(f"Skipping object detection for image: {image.id}")
 
             headers = self.get_success_headers(serializer.data)
-            return Response(
-                image.to_dict(), status=status.HTTP_201_CREATED, headers=headers
-            )
+            return Response(image.to_dict(), status=status.HTTP_200_OK, headers=headers)
         except ValidationError as e:
             log.warn(f"Exception while processing image: {e.detail}")
             raise
@@ -59,7 +58,7 @@ class ImageViewSet(viewsets.ModelViewSet):
         if objects is not None:
             queryset = Image.objects.filter(blacklisted=blacklisted).filter(
                 reduce(
-                    lambda x, y: x | y,
+                    lambda x, y: x & y,
                     [
                         Q(detected_objects__icontains=object)
                         for object in objects.split(",")

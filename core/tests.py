@@ -1,5 +1,6 @@
+import io
 from logging import Logger
-from rest_framework.exceptions import ValidationError,ErrorDetail
+from rest_framework.exceptions import ValidationError, ErrorDetail
 from django.test import TestCase
 import mock
 import pytest
@@ -13,6 +14,112 @@ from core.services import (
     validate_blacklisted_items,
     validate_nsfw,
 )
+
+from django.urls import reverse
+from rest_framework import status
+from rest_framework.test import APITestCase
+from core.serializers import ImageSerializer
+from django.contrib.auth.models import User
+
+
+@mock.patch("core.views.process_image_upload")
+@mock.patch.object(Logger, "info")
+@mock.patch.object(Logger, "warn")
+class ImageViewTests(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="testuser", password="testpass")
+        self.client.login(username="testuser", password="testpass")
+        self.image_data = {
+            "label": "Test Image",
+            "source_type": "UPLOAD",
+            "source": self._generate_photo_file(),
+            "detect_objects": True,
+        }
+
+    def test_create_image_success(
+        self, mock_warn, mock_info, mock_process_image_upload
+    ):
+        # Arrange
+        url = reverse("image-list")
+
+        # Act
+        response = self.client.post(url, self.image_data, format="multipart")
+
+        # Assert
+        result_image = Image.objects.get(id=response.data["id"])
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, result_image.to_dict())
+        mock_process_image_upload.assert_called_with(result_image)
+        mock_info.assert_not_called()
+        mock_warn.assert_not_called()
+
+    def test_skip_object_detection(
+        self, mock_warn, mock_info, mock_process_image_upload
+    ):
+        # Arrange
+        url = reverse("image-list")
+        self.image_data["detect_objects"] = False
+
+        # Act
+        response = self.client.post(url, self.image_data, format="multipart")
+
+        # Assert
+        result_image = Image.objects.get(id=response.data["id"])
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        mock_process_image_upload.assert_not_called()
+        mock_info.assert_called_with(
+            f"Skipping object detection for image: {result_image.id}"
+        )
+        mock_warn.assert_not_called()
+
+    def test_list_images_with_objects_returns_images_that_match_all_requested_objects(
+        self, mock_warn, mock_info, mock_process_image_upload
+    ):
+        # Arrange
+        Image.objects.create(
+            label="Image 1", detected_objects="cat,dog", uploaded_by=self.user
+        )
+        Image.objects.create(
+            label="Image 2", detected_objects="dog", uploaded_by=self.user
+        )
+        url = reverse("image-list")
+
+        # Act
+        response = self.client.get(url, {"objects": "dog,cat"})
+
+        # Assert
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        mock_process_image_upload.assert_not_called()
+        mock_info.assert_not_called()
+        mock_warn.assert_not_called()
+
+    def test_handle_validation_error(
+        self, mock_warn, mock_info, mock_process_image_upload
+    ):
+        # Arrange
+        url = reverse("image-list")
+        self.image_data["source"] = ""
+
+        # Act
+        response = self.client.post(url, self.image_data, format="multipart")
+
+        # Assert
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("detail", response.data)
+        mock_process_image_upload.assert_not_called()
+        mock_info.assert_not_called()
+        mock_warn.assert_not_called()
+
+    def _generate_photo_file(self):
+        file = io.BytesIO()
+        from PIL import Image as PILImage
+
+        image = PILImage.new("RGBA", size=(100, 100), color=(155, 0, 0))
+        image.save(file, "png")
+        file.name = "test.png"
+        file.seek(0)
+        return file
 
 
 @pytest.mark.django_db
@@ -93,7 +200,10 @@ class TestProcessImageUpload(TestCase):
         mock_warn_logger.assert_called_once_with(
             f"Image {image.id} contains NSFW content. Image blacklisted."
         )
-        self.assertEqual(ve.exception.detail, [ErrorDetail(string='Image contains NSFW content.', code='invalid')])
+        self.assertEqual(
+            ve.exception.detail,
+            [ErrorDetail(string="Image contains NSFW content.", code="invalid")],
+        )
 
     @mock.patch.object(ImaggaClient, "upload_image")
     @mock.patch.object(ImaggaClient, "get_tag_image_for_upload")
@@ -134,7 +244,10 @@ class TestProcessImageUpload(TestCase):
         mock_warn_logger.assert_called_once_with(
             f"Image {image.id} contains NSFW content. Image blacklisted."
         )
-        self.assertEqual(ve.exception.detail, [ErrorDetail(string='Image contains NSFW content.', code='invalid')])
+        self.assertEqual(
+            ve.exception.detail,
+            [ErrorDetail(string="Image contains NSFW content.", code="invalid")],
+        )
 
     @mock.patch.object(ImaggaClient, "upload_image")
     @mock.patch.object(ImaggaClient, "get_tag_image")
@@ -213,7 +326,10 @@ class TestProcessImageUpload(TestCase):
         mock_warn_logger.assert_called_once_with(
             f"Image {image.id} contains NSFW content. Image blacklisted."
         )
-        self.assertEqual(ve.exception.detail, [ErrorDetail(string='Image contains NSFW content.', code='invalid')])
+        self.assertEqual(
+            ve.exception.detail,
+            [ErrorDetail(string="Image contains NSFW content.", code="invalid")],
+        )
 
     @mock.patch.object(ImaggaClient, "upload_image")
     @mock.patch.object(ImaggaClient, "get_tag_image")
@@ -256,7 +372,10 @@ class TestProcessImageUpload(TestCase):
         mock_warn_logger.assert_called_once_with(
             f"Image {image.id} contains NSFW content. Image blacklisted."
         )
-        self.assertEqual(ve.exception.detail, [ErrorDetail(string='Image contains NSFW content.', code='invalid')])
+        self.assertEqual(
+            ve.exception.detail,
+            [ErrorDetail(string="Image contains NSFW content.", code="invalid")],
+        )
 
     @mock.patch.object(Logger, "warn")
     @mock.patch.object(ImaggaClient, "check_nsfw_categories")
