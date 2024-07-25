@@ -28,7 +28,7 @@ class ImageViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         detect_objects = "detect_objects" in request.data and request.data.pop(
             "detect_objects"
-        )
+    )
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 

@@ -1,5 +1,5 @@
 from logging import Logger
-from django.forms import ValidationError
+from rest_framework.exceptions import ValidationError,ErrorDetail
 from django.test import TestCase
 import mock
 import pytest
@@ -93,7 +93,7 @@ class TestProcessImageUpload(TestCase):
         mock_warn_logger.assert_called_once_with(
             f"Image {image.id} contains NSFW content. Image blacklisted."
         )
-        self.assertEqual(ve.exception.message, "Image contains NSFW content.")
+        self.assertEqual(ve.exception.detail, [ErrorDetail(string='Image contains NSFW content.', code='invalid')])
 
     @mock.patch.object(ImaggaClient, "upload_image")
     @mock.patch.object(ImaggaClient, "get_tag_image_for_upload")
@@ -134,7 +134,7 @@ class TestProcessImageUpload(TestCase):
         mock_warn_logger.assert_called_once_with(
             f"Image {image.id} contains NSFW content. Image blacklisted."
         )
-        self.assertEqual(ve.exception.message, "Image contains NSFW content.")
+        self.assertEqual(ve.exception.detail, [ErrorDetail(string='Image contains NSFW content.', code='invalid')])
 
     @mock.patch.object(ImaggaClient, "upload_image")
     @mock.patch.object(ImaggaClient, "get_tag_image")
@@ -213,7 +213,7 @@ class TestProcessImageUpload(TestCase):
         mock_warn_logger.assert_called_once_with(
             f"Image {image.id} contains NSFW content. Image blacklisted."
         )
-        self.assertEqual(ve.exception.message, "Image contains NSFW content.")
+        self.assertEqual(ve.exception.detail, [ErrorDetail(string='Image contains NSFW content.', code='invalid')])
 
     @mock.patch.object(ImaggaClient, "upload_image")
     @mock.patch.object(ImaggaClient, "get_tag_image")
@@ -256,7 +256,7 @@ class TestProcessImageUpload(TestCase):
         mock_warn_logger.assert_called_once_with(
             f"Image {image.id} contains NSFW content. Image blacklisted."
         )
-        self.assertEqual(ve.exception.message, "Image contains NSFW content.")
+        self.assertEqual(ve.exception.detail, [ErrorDetail(string='Image contains NSFW content.', code='invalid')])
 
     @mock.patch.object(Logger, "warn")
     @mock.patch.object(ImaggaClient, "check_nsfw_categories")

@@ -58,7 +58,7 @@ class Migration(migrations.Migration):
                         verbose_name="ID",
                     ),
                 ),
-                ("label", models.CharField(max_length=100)),
+                ("label", models.CharField(max_length=100, null=True, blank=True)),
                 (
                     "source_type",
                     models.CharField(
