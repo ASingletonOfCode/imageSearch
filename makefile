@@ -8,6 +8,12 @@ runserver:
 test:
 	python manage.py test
 
+# Make target to run tests with code coverage and then generate an HTML report in the htmlcov directory
+# Usage: make coverage
+coverage:
+	coverage run --source='.' manage.py test && coverage html
+
+
 # Make target to run black formatter
 # Usage: make black
 black:

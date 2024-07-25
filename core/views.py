@@ -6,6 +6,13 @@ from rest_framework.response import Response
 
 from core.models import Image
 from core.serializers import ImageSerializer
+from logging import Logger
+from rest_framework import status
+from rest_framework.exceptions import ValidationError
+
+from core.services import process_image_upload
+
+log = Logger(__name__)
 
 
 class ImageViewSet(viewsets.ModelViewSet):
@@ -17,13 +24,40 @@ class ImageViewSet(viewsets.ModelViewSet):
     serializer_class = ImageSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    # TODO: Allow uppercase and lowercase source_type
+    def create(self, request, *args, **kwargs):
+        detect_objects = "detect_objects" in request.data and request.data.pop(
+            "detect_objects"
+        )
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            image = Image.objects.create(
+                **{"uploaded_by": self.request.user}, **serializer.validated_data
+            )
+            if detect_objects:
+                process_image_upload(image)
+            else:
+                log.info(f"Skipping object detection for image: {image.id}")
+
+            headers = self.get_success_headers(serializer.data)
+            return Response(
+                image.to_dict(), status=status.HTTP_201_CREATED, headers=headers
+            )
+        except ValidationError as e:
+            log.warn(f"Exception while processing image: {e.detail}")
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
     def list(self, request, *args, **kwargs):
         """
         A view that accepts GET with a query parameter of "objects" detected in the image
         """
         objects = request.query_params.get("objects", None)
+        blacklisted = request.query_params.get("blacklisted", False)
+
         if objects is not None:
-            queryset = Image.objects.filter(
+            queryset = Image.objects.filter(blacklisted=blacklisted).filter(
                 reduce(
                     lambda x, y: x | y,
                     [
@@ -38,3 +72,11 @@ class ImageViewSet(viewsets.ModelViewSet):
             )
         else:
             return super().list(request, *args, **kwargs)
+
+    def handle_exception(self, exc):
+        print("I'm Here!!!!")
+        # This method can be overridden to customize error handling
+        if isinstance(exc, ValidationError):
+            # Return a custom response or modify the exception as needed
+            return Response({"detail": exc.detail}, status=exc.status_code)
+        return super().handle_exception(exc)

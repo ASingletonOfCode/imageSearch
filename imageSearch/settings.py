@@ -146,11 +146,11 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly",
     ],
-    # 'DEFAULT_RENDERER_CLASSES': (
-    #     'rest_framework.renderers.JSONRenderer',
-    #     'rest_framework.renderers.BrowsableAPIRenderer',
-    #     'rest_framework.renderers.MultiPartRenderer',
-    # ),
+    "DEFAULT_RENDERER_CLASSES": (
+        "rest_framework.renderers.JSONRenderer",
+        #     'rest_framework.renderers.BrowsableAPIRenderer',
+        #     'rest_framework.renderers.MultiPartRenderer',
+    ),
     "DEFAULT_PARSER_CLASSES": (
         "rest_framework.parsers.JSONParser",
         "rest_framework.parsers.FormParser",
@@ -179,3 +179,5 @@ CORS_ALLOW_HEADERS.append("authorization")
 #     CORS_ALLOWED_ORIGINS = [
 #         "http://localhost",
 #     ]
+
+IMAGE_SAFETY_CONFIDENCE_DEFAULT_THRESHOLD = 51.0
