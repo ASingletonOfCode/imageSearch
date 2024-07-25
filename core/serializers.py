@@ -14,3 +14,14 @@ class ImageSerializer(serializers.HyperlinkedModelSerializer):
             "source_url",
             "detected_objects",
         ]
+
+    def validate(self, data):
+        if data["source_type"] == "UPLOAD" and not data.get("source"):
+            raise serializers.ValidationError(
+                "source is required for source_type=upload"
+            )
+        if data["source_type"] == "URL" and not data.get("source_url"):
+            raise serializers.ValidationError(
+                "source_url is required for source_type=url"
+            )
+        return data
