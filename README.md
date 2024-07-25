@@ -1,4 +1,4 @@
-# HEB Image Search
+# Image Search
 
 ## Requirements
 
